@@ -12,7 +12,7 @@ static volatile bool running = true;
 // MAIN START #################################################################################
 
 int main(){
-    do{
+    while(running){
         clearConsole();
 
         printf("Hi user! This program will print all symbols from 32 to 255 (ASCII codes)...\n"
@@ -28,7 +28,6 @@ int main(){
         if (len == 0){
             printf("\nYou entered empty string...\n");
             running = userExitProccess();
-            if (running) clearInputBuffer();
             continue;
         }
 
@@ -36,7 +35,6 @@ int main(){
             printf("\nYou entered too many symbols...\n");
             clearInputBuffer();
             running = userExitProccess();
-            if (running) clearInputBuffer();
             continue;
         }
 
@@ -46,11 +44,8 @@ int main(){
         }
 
         running = userExitProccess();
-        if (running){
-            clearInputBuffer();
-        }
 
-    } while (running);
+    };
 
     return 0;
 }
@@ -67,14 +62,23 @@ void clearConsole() {
 
 int userExitProccess(){
     printf("\nEnter 1 to restart and anything else to exit: ");
-    char userChoice = '0';
+    char userChoice[MAX_RESTART_STRING_LENGTH] = "";
 
-    const int expected_processed_inputs = 1;
-    if (scanf("%c", &userChoice) != expected_processed_inputs){
+    if (fgets(userChoice, sizeof(userChoice), stdin) == NULL) {
+        return EXIT; // EOF or error
+    }
+
+    if (strchr(userChoice, STRING_END_CHARACTER) == NULL){
+        clearInputBuffer();
         return EXIT;
     }
 
-    if (userChoice != '1'){
+    // check for empty input
+    if (userChoice[0] == '\0'){
+        return EXIT;
+    }
+
+    if (strcmp(userChoice, "1\n") != 0) {
         return EXIT;
     }
    
